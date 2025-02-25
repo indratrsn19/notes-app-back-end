@@ -3,3 +3,5 @@ notes-api-webserver.pem
 pilaf_credentials.csv
 notes-api-test.postman_collection.json
 notes-api-test.postman_environment.json
+.env
+.prod.env
