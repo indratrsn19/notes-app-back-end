@@ -1,5 +1,5 @@
-const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const { nanoid } = require('nanoid');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
@@ -11,8 +11,6 @@ class UsersService {
     }
 
     async addUser({ username, password, fullname }) {
-        // TODO: Verifikasi username, pastikan belum terdaftar.
-        // TODO: Bila verifikasi lolos, maka masukkan user baru ke database.
         await this.verifyNewUsername(username);
         const id = `user-${nanoid(16)}`;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -62,6 +60,7 @@ class UsersService {
             text: 'SELECT id, password FROM users WHERE username = $1',
             values: [username],
         };
+
         const result = await this._pool.query(query);
 
         if (!result.rows.length) {
@@ -77,6 +76,15 @@ class UsersService {
         }
 
         return id;
+    }
+
+    async getUsersByUsername(username) {
+        const query = {
+            text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+            values: [`%${username}%`],
+        };
+        const result = await this._pool.query(query);
+        return result.rows;
     }
 }
 
